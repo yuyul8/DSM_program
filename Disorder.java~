@@ -1,0 +1,190 @@
+/* FILENAME: Disorder.java
+ * AUTHOR: Yuyu Li
+ * LAST MODIFIED: 12/18/2014
+ * 
+ * PURPOSE: 
+ * 
+ * */
+
+
+import java.util.*;
+import java.io.*;
+import javafoundations.*;
+
+
+/** *****************************************************************************
+  * A Disorder class 
+  * 
+  * @author Yuyu Li
+  *************************************************************************** **/
+public class Disorder {
+  
+  //instance variables
+  protected String disorderName;
+  //protected static int numSymptomsNeeded;
+  protected LinkedList<String> symptomsLL; //= new LinkedList<String>(); //initialize here?
+  protected LinkedList<LinkedList<String>> criteriaLL; //= new LinkedList<LinkedList<String>>();
+  protected int criteriaCount; //keeps track of criteria, serves as counter
+  
+  
+  /** *****************************************************************************
+    * Constructor
+    *
+    * 
+    * @throws FileNotFoundException
+    * @params filename
+    **************************************************************************** **/
+  public Disorder(String filename) throws FileNotFoundException {
+    symptomsLL = new LinkedList<String>();
+    criteriaLL = new LinkedList<LinkedList<String>>();
+    
+    try {
+      Scanner s = new Scanner(new File(filename));
+      disorderName = s.nextLine();
+      
+      while (!(s.hasNext("#"))) {
+        symptomsLL.add(s.nextLine());
+      }
+      s.nextLine();
+      
+      while (s.hasNextLine()) {
+        addCriteria(s.nextLine());
+      }
+      s.close();
+    }
+    catch (Exception e) {
+      System.out.println(e);
+    }
+  }
+  
+  
+  
+  /** *****************************************************************************
+    * adds criteria to disorder, splits using ";"
+    **************************************************************************** **/
+  public void addCriteria(String questions) {
+    LinkedList<String> questionsLL = new LinkedList<String>();
+    String[] questionsArray = questions.split(";");
+    
+    //adds the questions in the criteria into the linked list 
+    for (int i = 0; i < questionsArray.length; i++) {
+      questionsLL.add(questionsArray[i]);
+    }
+    
+    //checks that the criteria is not already in the linked list
+    if (criteriaLL.contains(questionsLL)) {
+      System.out.println("ERROR: this criteria has already been added");
+    } else {
+      criteriaLL.add(questionsLL);
+      criteriaCount++;
+    }
+  }
+  
+  
+  /** *****************************************************************************
+    *removes criteria from the disorder
+    **************************************************************************** **/
+  public void removeCriteria(char criteriaToRemove) {
+    if ((criteriaToRemove > (char)(criteriaCount + 65)) || (criteriaToRemove < 65)) {
+      System.out.println("YOU CANNOT REMOVE A NONEXISTENT CRITERA.");
+    } else {
+      criteriaLL.remove(criteriaToRemove-65);
+      criteriaCount--;
+    }
+  }
+  
+  /** *****************************************************************************
+    * gets the name of the disorder
+    **************************************************************************** **/
+  public String getName() {
+    return disorderName;
+  }
+  
+  
+  /** *****************************************************************************
+    * getter for criteria
+    **************************************************************************** **/
+  public LinkedList<LinkedList<String>> getCriteria() {
+    return criteriaLL;
+  }
+  /** *****************************************************************************
+    * getter for symptoms
+    **************************************************************************** **/
+  public LinkedList<String> getSymptoms() {
+    return symptomsLL;
+  }
+  
+  /** *****************************************************************************
+    * getter for criteria counter
+    **************************************************************************** **/
+  public int getCriteriaCount() {
+    return criteriaCount;
+  }
+  
+  /** *****************************************************************************
+    * getter for tree
+    **************************************************************************** **/
+  public BinaryTree<String> getTree() {
+    DisorderExpert de = new DisorderExpert();
+    if(disorderName.toLowerCase().equals("schizophrenia"))
+      return de.getSchiTree();
+    if(disorderName.toLowerCase().equals("major depressive disorder"))
+      return de.getMajDepTree();
+    else return null;
+  }
+  
+  /** *****************************************************************************
+    * creates a string representation
+    **************************************************************************** **/
+  public String toString() {
+    String s = "Disorder name: " + disorderName;
+    
+    s += "\nSymptoms:";
+    for (int i =0; i < symptomsLL.size(); i++) {
+      s += "\n  " + symptomsLL.get(i);
+    }
+    s+= "\n";
+    
+    for (int j = 0; j < criteriaLL.size(); j++) {
+      s += "\nCriteria " + (char)(j + 65);
+      for (int k = 0; k < criteriaLL.get(j).size(); k++) {
+        s += "\n  " + criteriaLL.get(j).get(k);
+      }
+      s += "\n";
+    }
+    return s;
+  }
+  /** *****************************************************************************
+    * testing code
+    * @params args
+    **************************************************************************** **/
+  public static void main(String[] args) {
+    try {
+      //Disorder d = new Disorder("schizophrenia.txt");
+      //System.out.println(d);
+      //System.out.println(d.getCriteria());
+      
+      Disorder e = new Disorder("majorDepressiveDisorder.txt");
+      System.out.println(e);
+      
+    } catch (Exception e) {
+      System.out.println(e);
+    }
+    
+    /*Disorder d = new Disorder("Test", "coughing, sneezing, headaches", 2);
+     System.out.println(d);
+     
+     System.out.println("\nAdding a criteria to the disorder:\n");
+     d.addCriteria("Has the patient had these symptoms for more than a day?;" +
+     "Is the patient free from preexisting conditions with the same symptoms?;");
+     System.out.println(d);
+     
+     System.out.println("\nRemoving a criteria from the disorder:\n");
+     d.removeCriteria('B');
+     System.out.println(d);
+     
+     System.out.println("\nRemoving a criteria from the disorder:\n");
+     d.removeCriteria('A');
+     System.out.println(d);*/
+  }
+}

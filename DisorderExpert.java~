@@ -1,0 +1,187 @@
+/* FILENAME: Disorder.java
+ * AUTHOR: Yuyu Li
+ * LAST MODIFIED: 12/18/2014
+ * 
+ * PURPOSE: 
+ * 
+ * */
+
+
+import java.util.*;
+import java.io.*;
+import javafoundations.*;
+
+/** *****************************************************************************
+  * A DisorderExpert class 
+  * 
+  * @author Yuyu Li
+  *************************************************************************** **/
+public class DisorderExpert {
+  
+  private LinkedList<Disorder> disorderList;
+  //instance variable for tree
+  private LinkedBinaryTree<String> schizophreniaChecker;
+  private LinkedBinaryTree<String> majDepressiveChecker;
+  String yes = "The patient fits the criteria for this disorder.";
+  String no = "The patient DOES NOT fit the criteria for this disorder."; 
+  
+  /** *****************************************************************************
+    * Constructor
+    *
+    *
+    **************************************************************************** **/
+  public DisorderExpert() {
+    try {
+      disorderList = new LinkedList<Disorder>();
+      schizophreniaChecker = makeSchiTree();
+      majDepressiveChecker = makeMajDepTree();
+      
+    } catch (Exception e) {
+      System.out.println(e);
+    }
+  }
+  
+  /** *****************************************************************************
+    *
+    *
+    **************************************************************************** **/
+  public LinkedBinaryTree<String> makeSchiTree() throws FileNotFoundException {
+    try{
+      Disorder schizophrenia = new Disorder("schizophrenia.txt");
+      addToList(schizophrenia);
+      LinkedList<LinkedList<String>> schiCopy = schizophrenia.getCriteria();
+      
+      LinkedBinaryTree<String> critA, critB, critC, critD, critE, critF;
+      critF = new LinkedBinaryTree<String>(schiCopy.removeLast().toString(), new LinkedBinaryTree(no), new LinkedBinaryTree(yes));
+      critE = new LinkedBinaryTree<String>(schiCopy.removeLast().toString(), new LinkedBinaryTree(no), critF);
+      critD = new LinkedBinaryTree<String>(schiCopy.removeLast().toString(), new LinkedBinaryTree(no), critE);
+      critC = new LinkedBinaryTree<String>(schiCopy.removeLast().toString(), new LinkedBinaryTree(no), critD);
+      critB = new LinkedBinaryTree<String>(schiCopy.removeLast().toString(), new LinkedBinaryTree(no), critC);
+      critA = new LinkedBinaryTree<String>(schiCopy.removeLast().toString(), new LinkedBinaryTree(no), critB);
+      
+      return critA;
+      
+    } catch (Exception e) {
+      System.out.println(e);
+    }
+    return null;
+  }
+  
+  /** *****************************************************************************
+    *
+    *@throws FileNotFoundException
+    **************************************************************************** **/
+  public LinkedBinaryTree<String> makeMajDepTree() throws FileNotFoundException {
+    try{
+      Disorder majDepressive = new Disorder("majorDepressiveDisorder.txt");
+      addToList(majDepressive);
+      LinkedList<LinkedList<String>> majDepCopy = majDepressive.getCriteria();
+      
+      LinkedBinaryTree<String> critA, critB, critC, critD, critE;
+      critE = new LinkedBinaryTree<String>(majDepCopy.removeLast().toString(), new LinkedBinaryTree(no), new LinkedBinaryTree(yes));
+      critD = new LinkedBinaryTree<String>(majDepCopy.removeLast().toString(), new LinkedBinaryTree(no), critE);
+      critC = new LinkedBinaryTree<String>(majDepCopy.removeLast().toString(), new LinkedBinaryTree(no), critD);
+      critB = new LinkedBinaryTree<String>(majDepCopy.removeLast().toString(), new LinkedBinaryTree(no), critC);
+      critA = new LinkedBinaryTree<String>(majDepCopy.removeLast().toString(), new LinkedBinaryTree(no), critB);
+      
+      return critA;
+      
+    } catch (Exception e) {
+      System.out.println(e);
+    }
+    return null;
+  }
+  
+  /** *****************************************************************************
+    *returns the schizophrenia tree
+    *
+    **************************************************************************** **/
+  public BinaryTree<String> getSchiTree() {
+    return schizophreniaChecker;
+  }
+  
+  /** *****************************************************************************
+    * returns the major depression tree
+    *
+    **************************************************************************** **/
+  public BinaryTree<String> getMajDepTree() {
+    return majDepressiveChecker;
+  }
+  
+  /** *****************************************************************************
+    *
+    * returns the disorder list
+    **************************************************************************** **/
+  public LinkedList<Disorder> getDisorderList() {
+    return disorderList;
+  }
+  
+  /** *****************************************************************************
+    *
+    *returns the number of disorders
+    **************************************************************************** **/
+  public int getDisorderCount() {
+    return disorderList.size();
+  }
+  
+  /** *****************************************************************************
+    *
+    * adds the given disorder to the master list
+    * 
+    * @params d
+    **************************************************************************** **/
+  public void addToList (Disorder d) {
+    if (disorderList.contains(d)) 
+      System.out.println("The master list already contains this disorder.");
+    else 
+      disorderList.add(d);
+  }
+  
+  /** *****************************************************************************
+    *checks if the diagnosis is correct 
+    *@params d
+    **************************************************************************** **/
+  public void checkDiagnosis(Disorder d) {
+    Scanner scan = new Scanner(System.in);
+    LinkedBinaryTree current = schizophreniaChecker;
+    
+    System.out.println("I will check if the diagnosis is correct.");
+    
+    while(current.size() > 1) {
+      System.out.println(current.getRootElement());
+      if(scan.nextLine().equalsIgnoreCase("N"))
+        current = current.getLeft();
+      else
+        current = current.getRight();
+    }
+    System.out.println(current.getRootElement());
+  }
+  
+  /** *****************************************************************************
+    * returns a string representation
+    *
+    **************************************************************************** **/
+  public String toString() {
+    return schizophreniaChecker.toString();
+  }
+  
+  /** *****************************************************************************
+    * test code
+    *
+    **************************************************************************** **/
+  public static void main (String[] args) {
+    try {
+      DisorderExpert de = new DisorderExpert();
+      Disorder schizophrenia = new Disorder("schizophrenia.txt");
+      Disorder majdep = new Disorder("majorDepressiveDisorder.txt");
+      //System.out.println(de);
+      //de.checkDiagnosis(schizophrenia);
+      //de.checkDiagnosis(majdep);
+      System.out.println(de.getMajDepTree());
+    } catch(Exception e) {
+      System.out.println(e);
+    }
+    //System.out.println(test);
+    //System.out.println(de);
+  }
+}
